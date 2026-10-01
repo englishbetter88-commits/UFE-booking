@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UFE · Анги, суудал захиалга</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:#f3f5f9;font-family:Inter,system-ui,"Segoe UI",Arial,sans-serif;color:#1f2937}
+.inp{margin-top:.25rem;width:100%;border-radius:.5rem;border:1px solid #d1d5db;background:#fff;padding:.55rem .75rem;font-size:.875rem;color:#111827}
+.inp:focus{outline:none;box-shadow:0 0 0 2px #3b82f6;border-color:#3b82f6}
+.inp:disabled{background:#f3f4f6;color:#6b7280}
+.btn{border-radius:.5rem;background:#2563eb;color:#fff;font-weight:600;font-size:.875rem;padding:.6rem 1.25rem;transition:background .15s}
+.btn:hover{background:#1d4ed8}.btn:disabled{background:#d1d5db;cursor:not-allowed}
+.btn2{border-radius:.5rem;border:1px solid #d1d5db;background:#fff;font-size:.875rem;padding:.5rem 1rem}
+.btn2:hover{background:#f3f4f6}
+button:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ================= НЭВТРЭХ ХЭСЭГ ================= -->
+<section id="authView" class="hidden min-h-screen grid lg:grid-cols-2">
+  <div class="hidden lg:flex flex-col justify-between bg-blue-700 text-white p-12">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-lg bg-white text-blue-700 grid place-items-center font-bold">U</div>
+      <span class="font-semibold text-lg">UFE</span>
+    </div>
+    <div>
+      <h2 class="text-3xl font-semibold leading-snug">Ангийн байр, суудлаа<br>урьдчилан захиал</h2>
+      <p class="mt-4 text-blue-100 max-w-md">Сул анги, суудлыг цагийн хуваариар хараад, хүссэн суудлаа сонгон захиална. Зөвхөн сургуулийн имэйл хаягаар нэвтэрнэ.</p>
+    </div>
+    <p class="text-sm text-blue-200">2026-2027, намрын улирал</p>
+  </div>
+  <div class="flex items-center justify-center p-5">
+    <div class="w-full max-w-md bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+      <div id="authBox"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ҮНДСЭН СИСТЕМ ================= -->
+<div id="appView" class="hidden">
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="h-8 w-8 rounded-lg bg-blue-600 text-white grid place-items-center font-bold text-sm">U</div>
+        <span class="font-semibold hidden sm:inline">UFE захиалга</span>
+      </div>
+      <nav class="flex gap-1 text-sm flex-1 overflow-x-auto" id="mainNav">
+        <button data-tab="book" class="px-3 py-1.5 rounded-lg whitespace-nowrap">Захиалга хийх</button>
+        <button data-tab="mine" class="px-3 py-1.5 rounded-lg whitespace-nowrap">Миний захиалга</button>
+        <button data-tab="profile" class="px-3 py-1.5 rounded-lg whitespace-nowrap">Профайл</button>
+      </nav>
+      <div class="flex items-center gap-3 shrink-0">
+        <span id="hdrName" class="text-sm text-gray-600 hidden md:inline"></span>
+        <button id="logoutBtn" class="btn2">Гарах</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
+
+    <!-- Захиалга хийх -->
+    <div id="tab-book" class="space-y-5">
+      <section class="rounded-xl bg-blue-600 text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <p class="font-semibold">2026-2027, намрын улирал / Бакалаврын өдрийн анги</p>
+          <p id="bannerStat" class="text-sm text-blue-100 mt-1"></p>
+        </div>
+        <p class="text-xs text-blue-100 sm:text-right">Систем шинэчилсэн:<br><span class="text-white font-medium">2026-10-01, 09:41</span></p>
+      </section>
+
+      <section class="bg-white rounded-xl border border-gray-200 p-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+          <label class="lg:col-span-2 text-xs font-medium text-gray-500">Огноо<select id="fDate" class="inp"></select></label>
+          <label class="text-xs font-medium text-gray-500">Эхлэх цаг<select id="fStart" class="inp"></select></label>
+          <label class="text-xs font-medium text-gray-500">Дуусах цаг<select id="fEnd" class="inp"></select></label>
+          <label class="text-xs font-medium text-gray-500">Давхар<select id="fFloor" class="inp"></select></label>
+          <label class="text-xs font-medium text-gray-500">Хамгийн багадаа сул суудал<input id="fMin" type="number" min="0" value="0" class="inp"></label>
+        </div>
+        <div class="mt-3 flex justify-end"><button id="searchBtn" class="btn w-full sm:w-auto sm:px-10">Хайх</button></div>
+      </section>
+
+      <div class="flex flex-col lg:flex-row gap-5">
+        <aside class="lg:w-64 shrink-0">
+          <div class="bg-white rounded-xl border border-gray-200 p-3 lg:sticky lg:top-20">
+            <h2 class="px-2 pb-2 text-sm font-semibold text-gray-700">Давхраар шүүх</h2>
+            <nav id="sidebar" class="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0"></nav>
+          </div>
+        </aside>
+        <div class="flex-1 min-w-0 space-y-5">
+          <section>
+            <div class="flex items-baseline justify-between mb-3">
+              <h2 class="font-semibold text-gray-800">Сул анги, талбай</h2>
+              <span id="resultCount" class="text-sm text-gray-500"></span>
+            </div>
+            <div id="cards" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+          </section>
+          <section class="bg-white rounded-xl border border-gray-200">
+            <div class="p-4 border-b border-gray-200">
+              <h2 class="font-semibold text-gray-800">Цагийн хуваарь ба сул суудлын матриц</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Нүд бүрд тухайн цагт сул байгаа суудлын тоо. Сонгосон хугацаа цэнхэрээр тодорно.</p>
+            </div>
+            <div class="overflow-x-auto"><table id="matrix" class="w-full text-sm border-separate border-spacing-0"></table></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-mine" class="hidden"></div>
+    <div id="tab-profile" class="hidden"></div>
+  </main>
+</div>
+
+<!-- Суудал сонгох цонх -->
+<div id="modal" class="hidden fixed inset-0 z-50 bg-gray-900/50 p-4 overflow-y-auto" role="dialog" aria-modal="true">
+  <div class="bg-white rounded-xl max-w-md mx-auto mt-6 p-5 shadow-xl">
+    <div class="flex items-start justify-between">
+      <div><h3 id="mTitle" class="font-semibold text-lg"></h3><p id="mSub" class="text-sm text-gray-500"></p></div>
+      <button id="mClose" class="text-gray-400 hover:text-gray-700 text-2xl leading-none" aria-label="Хаах">&times;</button>
+    </div>
+    <div class="mt-3 text-xs text-gray-500 flex flex-wrap gap-x-4 gap-y-1">
+      <span class="flex items-center gap-1"><i class="h-3 w-3 rounded bg-blue-100 border border-blue-300"></i>Сул</span>
+      <span class="flex items-center gap-1"><i class="h-3 w-3 rounded bg-blue-600"></i>Сонгосон</span>
+      <span class="flex items-center gap-1"><i class="h-3 w-3 rounded bg-gray-200"></i>Захиалгатай</span>
+    </div>
+    <div class="mt-3 rounded-md bg-gray-100 text-center text-xs text-gray-500 py-1.5">Самбар · Багшийн ширээ</div>
+    <div id="seatGrid" class="mt-3 space-y-1.5 max-h-80 overflow-y-auto p-1"></div>
+    <p id="mErr" class="mt-2 text-sm text-red-600"></p>
+    <div class="mt-3 flex items-center justify-between gap-3">
+      <span id="mCount" class="text-sm text-gray-600"></span>
+      <button id="mConfirm" class="btn" disabled>Захиалах</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-lg bg-gray-900 text-white text-sm px-4 py-2 shadow-lg"></div>
+
+<script>
+/* ================= ТУСЛАХ ФУНКЦ ================= */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const mem = {};
+const store = {
+  get(k, f){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch { return mem[k] ?? f; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch { mem[k] = v; } },
+  del(k){ try { localStorage.removeItem(k); } catch { delete mem[k]; } }
+};
+const toast = t => { const el = $("toast"); el.textContent = t; el.classList.remove("hidden"); setTimeout(()=>el.classList.add("hidden"), 2800); };
+const range = (a,b) => Array.from({length:b-a+1}, (_,i)=>a+i);
+const hash = s => { let x = 0; for (const c of s) x = (x*31 + c.charCodeAt(0)) >>> 0; return x; };
+
+/* ================= НЭВТРЭЛТИЙН ЛОГИК =================
+   АНХААР: энэ хэсэг нь ТУРШИЛТЫН (demo) хувилбар. Хэрэглэгчид зөвхөн энэ браузерт хадгалагдана.
+   Бодит системд api.* функцүүдийг серверийн (Supabase/Firebase/өөрийн backend) дуудлагаар солино. */
+const EMAIL_RE = /^[a-z0-9._%+-]+@ufe\.edu\.mn$/i;
+async function hashPw(pw, salt){
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey("raw", enc.encode(pw), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({name:"PBKDF2", salt:enc.encode(salt), iterations:100000, hash:"SHA-256"}, key, 256);
+  return [...new Uint8Array(bits)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+const rnd = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b=>b.toString(16).padStart(2,"0")).join("");
+const pwError = p => p.length < 8 ? "Нууц үг хамгийн багадаа 8 тэмдэгттэй байна." : !(/[A-Za-z]/.test(p) && /\d/.test(p)) ? "Нууц үгэнд үсэг болон тоо хоёулаа орно." : "";
+const users = () => store.get("ufe_users", {});
+const saveUsers = u => store.set("ufe_users", u);
+const newCode = () => String(100000 + crypto.getRandomValues(new Uint32Array(1))[0] % 900000);
+let me = null; // нэвтэрсэн хэрэглэгч
+
+/* ================= НЭВТРЭХ / БҮРТГҮҮЛЭХ ДЭЛГЭЦ ================= */
+function authScreen(mode, email){
+  const box = $("authBox");
+  const head = (t, s) => `<h1 class="text-xl font-semibold">${t}</h1><p class="text-sm text-gray-500 mt-1">${s}</p>`;
+  const err = `<p id="authMsg" class="text-sm text-red-600 min-h-[1.25rem]" role="alert"></p>`;
+  const tabs = `<div class="flex gap-1 bg-gray-100 rounded-lg p-1 mb-5 text-sm">
+    <button data-m="login" class="flex-1 py-1.5 rounded-md ${mode==="login"?"bg-white shadow-sm font-semibold":"text-gray-500"}">Нэвтрэх</button>
+    <button data-m="register" class="flex-1 py-1.5 rounded-md ${mode==="register"?"bg-white shadow-sm font-semibold":"text-gray-500"}">Бүртгүүлэх</button></div>`;
+
+  if (mode === "login") box.innerHTML = tabs + head("Тавтай морил","Сургуулийн имэйл хаягаараа нэвтэрнэ үү.") + `
+    <form id="authForm" class="mt-5 space-y-3" autocomplete="on">
+      <label class="block text-xs font-medium text-gray-500">Имэйл<input name="email" type="email" required autocomplete="username" placeholder="нэр@ufe.edu.mn" class="inp"></label>
+      <label class="block text-xs font-medium text-gray-500">Нууц үг<input name="pw" type="password" required autocomplete="current-password" class="inp"></label>
+      ${err}<button class="btn w-full">Нэвтрэх</button></form>`;
+
+  if (mode === "register") box.innerHTML = tabs + head("Шинэ хэрэглэгч","Зөвхөн @ufe.edu.mn хаягаар бүртгүүлнэ.") + `
+    <form id="authForm" class="mt-5 space-y-3" autocomplete="on">
+      <div class="grid grid-cols-2 gap-3">
+        <label class="block text-xs font-medium text-gray-500">Овог<input name="last" required class="inp" autocomplete="family-name"></label>
+        <label class="block text-xs font-medium text-gray-500">Нэр<input name="first" required class="inp" autocomplete="given-name"></label>
+      </div>
+      <label class="block text-xs font-medium text-gray-500">Сургуулийн имэйл<input name="email" type="email" required placeholder="нэр@ufe.edu.mn" class="inp" autocomplete="username"></label>
+      <label class="block text-xs font-medium text-gray-500">Нууц үг<input name="pw" type="password" required class="inp" autocomplete="new-password"></label>
+      <label class="block text-xs font-medium text-gray-500">Нууц үг давтах<input name="pw2" type="password" required class="inp" autocomplete="new-password"></label>
+      <p class="text-xs text-gray-400">8-аас дээш тэмдэгт, үсэг ба тоо агуулсан байна.</p>
+      ${err}<button class="btn w-full">Бүртгүүлэх</button></form>`;
+
+  if (mode === "verify") {
+    const u = users()[email];
+    box.innerHTML = head("Имэйлээ баталгаажуулах", `<b>${esc(email)}</b> хаягт 6 оронтой код илгээсэн.`) + `
+      <div class="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">Туршилтын хувилбар тул имэйл илгээгдэхгүй. Таны код: <b class="text-base tracking-widest">${esc(u.code)}</b></div>
+      <form id="authForm" class="mt-4 space-y-3">
+        <label class="block text-xs font-medium text-gray-500">Баталгаажуулах код<input name="code" inputmode="numeric" maxlength="6" required class="inp tracking-widest" autocomplete="one-time-code"></label>
+        ${err}<button class="btn w-full">Баталгаажуулах</button>
+        <button type="button" id="backLogin" class="btn2 w-full">Нэвтрэх хуудас руу буцах</button></form>`;
+    $("backLogin").onclick = () => authScreen("login");
+  }
+
+  box.querySelectorAll("[data-m]").forEach(b => b.onclick = () => authScreen(b.dataset.m));
+  const msg = t => $("authMsg").textContent = t;
+  $("authForm").onsubmit = async e => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    const btn = e.target.querySelector(".btn"); btn.disabled = true;
+    try {
+      if (mode === "register") {
+        const em = f.email.trim().toLowerCase();
+        if (!EMAIL_RE.test(em)) return msg("Зөвхөн @ufe.edu.mn төгсгөлтэй сургуулийн имэйл хаяг зөвшөөрнө.");
+        if (pwError(f.pw)) return msg(pwError(f.pw));
+        if (f.pw !== f.pw2) return msg("Нууц үг хоорондоо таарахгүй байна. Дахин давтан оруулна уу.");
+        const all = users();
+        if (all[em]?.verified) return msg("Энэ имэйлээр бүртгэл үүссэн байна. Нэвтэрнэ үү.");
+        const salt = rnd(16);
+        all[em] = {email:em, first:f.first.trim(), last:f.last.trim(), salt, hash:await hashPw(f.pw, salt), verified:false, code:newCode(), phone:"", dept:"", course:"", created:Date.now()};
+        saveUsers(all); authScreen("verify", em);
+      } else if (mode === "login") {
+        const em = f.email.trim().toLowerCase(), u = users()[em];
+        if (!u || u.hash !== await hashPw(f.pw, u.salt)) return msg("Имэйл эсвэл нууц үг буруу байна.");
+        if (!u.verified) { u.code = newCode(); const all = users(); all[em] = u; saveUsers(all); return authScreen("verify", em); }
+        store.set("ufe_session", em); enterApp(u);
+      } else {
+        const all = users(), u = all[email];
+        if (f.code.trim() !== u.code) return msg("Код буруу байна. Дахин шалгана уу.");
+        u.verified = true; u.code = ""; saveUsers(all); store.set("ufe_session", email); enterApp(u);
+      }
+    } finally { btn.disabled = false; }
+  };
+}
+
+/* ================= ӨГӨГДЛИЙН ЗАГВАР ================= */
+const PERIODS = ["I","II","III","IV","V","VI","VII","VIII","IX","X"];
+const STARTS = [480,540,600,660,740,800,860,920,980,1040];
+const hm = m => String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+const room = (g,id,cap,floor,off=false) => ({g,id:String(id),cap,floor:floor ?? Math.floor(id/100),off});
+const GROUPS = [
+  {k:"sport", l:"Спорт заал", rooms:[room("sport","Спорт заал",120,1)]},
+  {k:"g13", l:"Анги 1301–1306", rooms:range(1301,1306).map(n=>room("g13",n,26))},
+  {k:"lib", l:"Номын сан (70 суудал)", rooms:[room("lib","Номын сан",70,4)]},
+  {k:"g11", l:"Анги 1101–1106", rooms:range(1101,1106).map(n=>room("g11",n,26))},
+  {k:"off", l:"Ашиглагдахгүй заалнууд", rooms:[room("off","Заал Б",80,3,true)]},
+  {k:"g7", l:"Анги 701–706", rooms:range(701,706).map(n=>room("g7",n,26))},
+  {k:"g6", l:"Анги 601–608", rooms:range(601,608).map(n=>room("g6",n,26))},
+  {k:"g5", l:"Анги 501–508", rooms:range(501,508).map(n=>room("g5",n,26))},
+  {k:"lobby", l:"Лобби наалттай талбай", rooms:[room("lobby","Лобби талбай",40,1)]},
+  {k:"lab", l:"Лаборатори 202–208", rooms:range(202,208).map(n=>room("lab",n,26))},
+];
+const ROOMS = GROUPS.flatMap(g=>g.rooms);
+const DAY = ["Ня","Да","Мя","Лх","Пү","Ба","Бя"];
+const BASE = new Date(2026,9,1);
+const dateText = d => `${d.getMonth()+1}-р сарын ${d.getDate()}`;
+const DATES = range(0,6).map(i=>{ const d = new Date(BASE); d.setDate(d.getDate()+i); return {i, label: i===0 ? `Өнөөдөр - ${dateText(d)}` : `${DAY[d.getDay()]}, ${dateText(d)}`}; });
+
+/* Захиалгууд (тухайн браузерт хадгалагдана) */
+const getBookings = () => store.get("ufe_bookings", []);
+const overlap = (b, d, s, e) => b.d === d && !(b.e < s || b.s > e);
+function seatState(r, d, s, e, n){
+  if (r.off) return "taken";
+  for (let p = s; p <= e; p++) {
+    if (hash(r.id+"|"+p+"|"+d) % 10 < 1) return "taken";          // тухайн цагт анги хаалттай
+    if (hash(r.id+"|"+p+"|"+d+"|"+n) % 100 < 20) return "taken";  // өмнө нь захиалагдсан суудал
+  }
+  const b = getBookings().find(b => b.room === r.id && b.seat === n && overlap(b, d, s, e));
+  return b ? (b.user === me.email ? "mine" : "taken") : "free";
+}
+const freeCount = (r,d,s,e) => range(1,r.cap).filter(n => seatState(r,d,s,e,n) === "free").length;
+
+/* ================= АПП ================= */
+let group = "all", tab = "book", active = null, picked = null;
+
+function enterApp(u){
+  me = u; $("authView").classList.add("hidden"); $("appView").classList.remove("hidden");
+  $("hdrName").textContent = `${u.last} ${u.first}`;
+  go("book");
+}
+function go(t){
+  tab = t;
+  ["book","mine","profile"].forEach(k => $("tab-"+k).classList.toggle("hidden", k !== t));
+  $("mainNav").querySelectorAll("button").forEach(b => b.className = "px-3 py-1.5 rounded-lg whitespace-nowrap " + (b.dataset.tab===t ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-100"));
+  if (t==="book") render(); if (t==="mine") renderMine(); if (t==="profile") renderProfile();
+  window.scrollTo(0,0);
+}
+$("mainNav").onclick = e => { const b = e.target.closest("[data-tab]"); if (b) go(b.dataset.tab); };
+$("logoutBtn").onclick = () => { store.del("ufe_session"); me = null; $("appView").classList.add("hidden"); $("authView").classList.remove("hidden"); authScreen("login"); };
+
+/* Шүүлтүүр */
+$("fDate").innerHTML = DATES.map(d=>`<option value="${d.i}">${d.label}</option>`).join("");
+$("fStart").innerHTML = PERIODS.map((p,i)=>`<option value="${i}">${p} - ${hm(STARTS[i])}</option>`).join("");
+$("fEnd").innerHTML = PERIODS.map((p,i)=>`<option value="${i}">${p} - ${hm(STARTS[i]+50)}</option>`).join("");
+$("fStart").value = 7; $("fEnd").value = 7;
+const floors = [...new Set(ROOMS.map(r=>r.floor))].sort((a,b)=>b-a);
+$("fFloor").innerHTML = `<option value="all">Бүх давхар</option>` + floors.map(f=>`<option value="${f}">${f}-р давхар</option>`).join("");
+
+function renderSidebar(){
+  const item = (k,l,n,showN=true) => `<button data-g="${k}" class="whitespace-nowrap flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-left transition-colors ${group===k?"bg-blue-50 text-blue-700 font-semibold":"text-gray-600 hover:bg-gray-100"}"><span>${l}</span>${showN?`<span class="text-xs rounded-full px-2 py-0.5 ${group===k?"bg-blue-600 text-white":"bg-gray-100 text-gray-500"}">${n}</span>`:""}</button>`;
+  $("sidebar").innerHTML = item("all",`Бүх давхар (${ROOMS.length} анги/талбай)`,0,false) + GROUPS.map(g=>item(g.k,g.l,g.rooms.length)).join("");
+}
+$("sidebar").onclick = e => { const b = e.target.closest("[data-g]"); if (b) { group = b.dataset.g; renderSidebar(); render(); } };
+
+function render(){
+  renderSidebar();
+  let s = +$("fStart").value, e = +$("fEnd").value;
+  if (e < s) { e = s; $("fEnd").value = e; }
+  const d = +$("fDate").value, f = $("fFloor").value, min = +$("fMin").value || 0;
+  const all = ROOMS.map(r => ({r, free: freeCount(r,d,s,e)}));
+  const list = all.filter(({r,free}) => (group==="all"||r.g===group) && (f==="all"||r.floor===+f) && free>=min && (free>0 || (r.off && group==="off")));
+  const avail = all.filter(x=>x.free>0);
+  $("bannerStat").textContent = `${avail.length} ангид ${avail.reduce((a,x)=>a+x.free,0)} суудал сул байна (${hm(STARTS[s])} – ${hm(STARTS[e]+50)})`;
+  $("resultCount").textContent = `${list.length} үр дүн`;
+
+  $("cards").innerHTML = list.length ? list.map(({r,free}) => {
+    const num = /^\d+$/.test(r.id);
+    return `<article class="bg-white rounded-xl border border-gray-200 p-4 flex flex-col hover:border-blue-300 transition-colors">
+      <div class="flex items-start justify-between">
+        <div><p class="text-xs text-gray-500">${num?"Анги":"Талбай"}</p><h3 class="text-2xl font-bold text-gray-900">${esc(r.id)}</h3></div>
+        <span class="text-xs rounded-md bg-gray-100 text-gray-600 px-2 py-1">${r.floor}-р давхар</span>
+      </div>
+      <div class="mt-4"><p class="text-sm ${free?"text-gray-700":"text-gray-400"}"><b class="text-gray-900">${free}/${r.cap}</b> суудал сул</p>
+        <div class="mt-2 h-1.5 rounded-full bg-gray-100 overflow-hidden"><div class="h-full bg-blue-500" style="width:${Math.round(free/r.cap*100)}%"></div></div></div>
+      <button data-room="${esc(r.id)}" ${r.off?"disabled":""} class="btn mt-4">${r.off?"Ашиглах боломжгүй":"Суудал сонгох"}</button></article>`;
+  }).join("") : `<p class="col-span-full bg-white rounded-xl border border-dashed border-gray-300 p-8 text-center text-sm text-gray-500">Шүүлтүүрт таарах анги олдсонгүй. Цагийн хугацаа эсвэл суудлын доод тоог өөрчилнө үү.</p>`;
+
+  const th = "px-3 py-2 text-xs font-medium border-b border-gray-200 text-center whitespace-nowrap";
+  const head = `<tr><th class="sticky left-0 bg-gray-50 ${th} text-left">Анги</th>` + PERIODS.map((p,i)=>{ const on = i>=s&&i<=e;
+    return `<th class="${th} ${on?"bg-blue-600 text-white":"bg-gray-50 text-gray-600"}">${p}<br><span class="font-normal opacity-80">${hm(STARTS[i])}</span></th>`; }).join("") + `</tr>`;
+  const rows = list.map(({r}) => `<tr><td class="sticky left-0 bg-white px-3 py-2 border-b border-gray-100 font-semibold whitespace-nowrap">${esc(r.id)}</td>` +
+    PERIODS.map((_,p) => { const v = freeCount(r,d,p,p), on = p>=s&&p<=e;
+      const c = v===0 ? "bg-gray-100 text-gray-400" : v/r.cap>=.5 ? "bg-blue-100 text-blue-800" : "bg-blue-50 text-blue-700";
+      return `<td class="border-b border-gray-100 p-1 text-center"><div class="rounded-md py-1.5 ${c} ${on?"ring-2 ring-blue-500":""}">${v||"–"}</div></td>`; }).join("") + `</tr>`).join("");
+  $("matrix").innerHTML = `<thead>${head}</thead><tbody>${rows || `<tr><td colspan="11" class="p-6 text-center text-gray-500">Мэдээлэл алга</td></tr>`}</tbody>`;
+}
+$("searchBtn").onclick = render;
+
+/* ================= СУУДАЛ СОНГОХ ================= */
+$("cards").onclick = e => {
+  const b = e.target.closest("[data-room]"); if (!b) return;
+  active = ROOMS.find(r => r.id === b.dataset.room); picked = null; $("mErr").textContent = "";
+  const d = +$("fDate").value, s = +$("fStart").value, e2 = +$("fEnd").value;
+  active.ctx = {d, s, e: Math.max(s, e2)};
+  $("mTitle").textContent = (/^\d+$/.test(active.id) ? "Анги " : "") + active.id;
+  $("mSub").textContent = `${DATES[d].label} · ${hm(STARTS[s])} – ${hm(STARTS[active.ctx.e]+50)} · ${active.floor}-р давхар`;
+  drawSeats(); $("modal").classList.remove("hidden");
+};
+function drawSeats(){
+  const {d,s,e} = active.ctx, per = 6; let html = "";
+  for (let row = 0; row * per < active.cap; row++) {
+    html += `<div class="flex items-center justify-center gap-1.5">`;
+    for (let c = 0; c < per; c++) {
+      const n = row*per + c + 1; if (n > active.cap) break;
+      if (c === 3) html += `<span class="w-5"></span>`;
+      const st = seatState(active,d,s,e,n), sel = picked === n;
+      const cls = st==="taken" ? "bg-gray-200 text-gray-400 cursor-not-allowed" : st==="mine" ? "bg-green-100 border-green-400 text-green-800" : sel ? "bg-blue-600 border-blue-600 text-white" : "bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200";
+      html += `<button data-seat="${n}" ${st==="taken"||st==="mine"?"disabled":""} class="h-9 w-9 shrink-0 rounded-md border border-transparent text-xs font-medium ${cls}" aria-label="Суудал ${n}">${n}</button>`;
+    }
+    html += `</div>`;
+  }
+  $("seatGrid").innerHTML = html;
+  $("mCount").textContent = picked ? `${picked}-р суудал сонгосон` : "Суудлаа сонгоно уу";
+  $("mConfirm").disabled = !picked;
+}
+$("seatGrid").onclick = e => { const b = e.target.closest("[data-seat]"); if (!b || b.disabled) return; picked = +b.dataset.seat === picked ? null : +b.dataset.seat; $("mErr").textContent = ""; drawSeats(); };
+$("mConfirm").onclick = () => {
+  const {d,s,e} = active.ctx, all = getBookings();
+  if (seatState(active,d,s,e,picked) !== "free") { $("mErr").textContent = "Энэ суудлыг өөр хүн захиалчихлаа. Өөр суудал сонгоно уу."; picked = null; return drawSeats(); }
+  if (all.some(b => b.user === me.email && overlap(b,d,s,e))) { $("mErr").textContent = "Та энэ цагт өөр суудал захиалсан байна. Эхлээд тэр захиалгыг цуцлана уу."; return; }
+  all.push({id:rnd(6), user:me.email, room:active.id, floor:active.floor, seat:picked, d, s, e, at:Date.now()});
+  store.set("ufe_bookings", all); $("modal").classList.add("hidden");
+  toast(`Захиалга баталгаажлаа: ${active.id}, ${picked}-р суудал`); render();
+};
+const closeModal = () => $("modal").classList.add("hidden");
+$("mClose").onclick = closeModal;
+$("modal").onclick = e => { if (e.target === $("modal")) closeModal(); };
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+/* ================= МИНИЙ ЗАХИАЛГА ================= */
+function renderMine(){
+  const mine = getBookings().filter(b => b.user === me.email).sort((a,b)=>a.d-b.d||a.s-b.s);
+  $("tab-mine").innerHTML = `<h2 class="text-lg font-semibold mb-3">Миний захиалга</h2>` + (mine.length ?
+    `<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${mine.map(b=>`
+      <article class="bg-white rounded-xl border border-gray-200 p-4">
+        <div class="flex justify-between"><h3 class="text-xl font-bold">${/^\d+$/.test(b.room)?"Анги ":""}${esc(b.room)}</h3><span class="text-xs rounded-md bg-blue-50 text-blue-700 px-2 py-1 h-fit">${b.seat}-р суудал</span></div>
+        <p class="mt-2 text-sm text-gray-600">${DATES[b.d].label}<br>${hm(STARTS[b.s])} – ${hm(STARTS[b.e]+50)} · ${b.floor}-р давхар</p>
+        <button data-cancel="${b.id}" class="btn2 mt-3 w-full text-red-600">Захиалга цуцлах</button></article>`).join("")}</div>`
+    : `<div class="bg-white rounded-xl border border-dashed border-gray-300 p-10 text-center text-sm text-gray-500">Одоогоор захиалга алга. "Захиалга хийх" хэсгээс анги, суудлаа сонгоно уу.</div>`);
+}
+$("tab-mine").onclick = e => {
+  const b = e.target.closest("[data-cancel]"); if (!b || !confirm("Энэ захиалгыг цуцлах уу?")) return;
+  store.set("ufe_bookings", getBookings().filter(x => x.id !== b.dataset.cancel)); toast("Захиалга цуцлагдлаа"); renderMine();
+};
+
+/* ================= ПРОФАЙЛ ================= */
+function renderProfile(){
+  const n = getBookings().filter(b => b.user === me.email).length;
+  const lbl = "block text-xs font-medium text-gray-500";
+  $("tab-profile").innerHTML = `
+  <h2 class="text-lg font-semibold mb-3">Миний профайл</h2>
+  <div class="grid lg:grid-cols-3 gap-5">
+    <section class="bg-white rounded-xl border border-gray-200 p-5 text-center h-fit">
+      <div class="mx-auto h-20 w-20 rounded-full bg-blue-100 text-blue-700 grid place-items-center text-2xl font-bold">${esc((me.last[0]||"")+(me.first[0]||""))}</div>
+      <h3 class="mt-3 font-semibold">${esc(me.last)} ${esc(me.first)}</h3>
+      <p class="text-sm text-gray-500 break-all">${esc(me.email)}</p>
+      <p class="mt-3 text-sm text-gray-600">Нийт идэвхтэй захиалга: <b>${n}</b></p>
+    </section>
+    <div class="lg:col-span-2 space-y-5">
+      <form id="pForm" class="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        <h3 class="font-semibold">Хувийн мэдээлэл</h3>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <label class="${lbl}">Овог<input name="last" required class="inp" value="${esc(me.last)}"></label>
+          <label class="${lbl}">Нэр<input name="first" required class="inp" value="${esc(me.first)}"></label>
+          <label class="${lbl} sm:col-span-2">Имэйл<input class="inp" value="${esc(me.email)}" disabled></label>
+          <label class="${lbl}">Утасны дугаар<input name="phone" inputmode="tel" class="inp" value="${esc(me.phone)}"></label>
+          <label class="${lbl}">Салбар / тэнхим<input name="dept" class="inp" value="${esc(me.dept)}"></label>
+          <label class="${lbl}">Курс<select name="course" class="inp"><option value="">Сонгох</option>${[1,2,3,4].map(c=>`<option ${me.course==c?"selected":""}>${c}</option>`).join("")}<option ${me.course==="Багш"?"selected":""}>Багш</option></select></label>
+        </div>
+        <button class="btn">Хадгалах</button>
+      </form>
+      <form id="pwForm" class="bg-white rounded-xl border border-gray-200 p-5 space-y-3" autocomplete="off">
+        <h3 class="font-semibold">Нууц үг солих</h3>
+        <label class="${lbl}">Одоогийн нууц үг<input name="old" type="password" required class="inp" autocomplete="current-password"></label>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <label class="${lbl}">Шинэ нууц үг<input name="n1" type="password" required class="inp" autocomplete="new-password"></label>
+          <label class="${lbl}">Шинэ нууц үг давтах<input name="n2" type="password" required class="inp" autocomplete="new-password"></label>
+        </div>
+        <p id="pwMsg" class="text-sm text-red-600 min-h-[1.25rem]" role="alert"></p>
+        <button class="btn">Нууц үг солих</button>
+      </form>
+    </div>
+  </div>`;
+  $("pForm").onsubmit = e => {
+    e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)), all = users();
+    Object.assign(all[me.email], {last:f.last.trim(), first:f.first.trim(), phone:f.phone.trim(), dept:f.dept.trim(), course:f.course});
+    saveUsers(all); me = all[me.email]; $("hdrName").textContent = `${me.last} ${me.first}`; toast("Профайл хадгалагдлаа"); renderProfile();
+  };
+  $("pwForm").onsubmit = async e => {
+    e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)), msg = t => $("pwMsg").textContent = t;
+    if (me.hash !== await hashPw(f.old, me.salt)) return msg("Одоогийн нууц үг буруу байна.");
+    if (pwError(f.n1)) return msg(pwError(f.n1));
+    if (f.n1 !== f.n2) return msg("Шинэ нууц үг хоорондоо таарахгүй байна.");
+    const all = users(), salt = rnd(16); all[me.email].salt = salt; all[me.email].hash = await hashPw(f.n1, salt);
+    saveUsers(all); me = all[me.email]; e.target.reset(); toast("Нууц үг амжилттай солигдлоо");
+  };
+}
+
+/* ================= ЭХЛҮҮЛЭХ ================= */
+(function init(){
+  const em = store.get("ufe_session", null), u = em && users()[em];
+  if (u && u.verified) enterApp(u); else { $("authView").classList.remove("hidden"); authScreen("login"); }
+})();
+</script>
+</body>
+</html>
