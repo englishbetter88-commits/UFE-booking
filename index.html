@@ -409,7 +409,7 @@ async function issueReset(em){
 /* ---- Supabase: СЕРВЕР талын жинхэнэ нэвтрэлт ----
    Нууц үгийг сервер (bcrypt-ээр hash хийж) хадгална, имэйл баталгаажуулалт ба сэргээх кодыг сервер имэйлээр илгээнэ, оролдлогын хязгаарыг сервер хэрэгжүүлнэ.
    Асаахын тулд supabase.com дээр төсөл үүсгээд (тохируулах заавар: supabase-setup.sql) Project URL болон anon key-г доор бөглөнө. Хоосон бол туршилтын горимд ажиллана. */
-const SB = {url:"", anonKey:""};
+const SB = {url:"https://cavllzsfcdnicbsdvioe.supabase.co", anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhdmxsenNmY2RuaWNic2R2aW9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDMxODksImV4cCI6MjEwNjYxOTE4OX0.2OG1jrO_qHKFYHqRCCDqbOSQ2-WY4EYHByR3KfuruS0"};
 const SB_LIVE = !!(SB.url && SB.anonKey);
 const MAIL_LIVE = EMAIL_LIVE || SB_LIVE;
 function sbErr(status, j){
