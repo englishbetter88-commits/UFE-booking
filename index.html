@@ -515,7 +515,7 @@ function authScreen(mode, email, notice){
     box.innerHTML = head("Имэйлээ баталгаажуулах", `<b>${esc(email)}</b> хаягт 6 оронтой код илгээсэн.`) + `
       ${MAIL_LIVE ? "" : `<div class="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">Туршилтын хувилбар тул имэйл илгээгдэхгүй. Таны код: <b class="text-base tracking-widest">${esc(u.code)}</b></div>`}
       <form id="authForm" class="mt-4 space-y-3">
-        <label class="block text-xs font-medium text-gray-500">Баталгаажуулах код<input name="code" inputmode="numeric" maxlength="6" required class="inp tracking-widest" autocomplete="one-time-code"></label>
+        <label class="block text-xs font-medium text-gray-500">Баталгаажуулах код<input name="code" inputmode="numeric" maxlength="10" required class="inp tracking-widest" autocomplete="one-time-code"></label>
         ${err}<button class="btn w-full">Баталгаажуулах</button>
         <button type="button" id="backLogin" class="btn2 w-full">Нэвтрэх хуудас руу буцах</button></form>`;
     $("backLogin").onclick = () => authScreen("login");
@@ -534,7 +534,7 @@ function authScreen(mode, email, notice){
     box.innerHTML = head("Нууц үг сэргээх", `<b>${esc(email)}</b> хаягт 6 оронтой код илгээсэн. Код 10 минут хүчинтэй.`) +
       (MAIL_LIVE || !r ? "" : `<div class="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">Туршилтын хувилбар тул имэйл илгээгдэхгүй. Таны код: <b class="text-base tracking-widest">${esc(r.code)}</b></div>`) + `
       <form id="authForm" class="mt-4 space-y-3" autocomplete="off">
-        <label class="block text-xs font-medium text-gray-500">Баталгаажуулах код<input name="code" inputmode="numeric" maxlength="6" required class="inp tracking-widest" autocomplete="one-time-code"></label>
+        <label class="block text-xs font-medium text-gray-500">Баталгаажуулах код<input name="code" inputmode="numeric" maxlength="10" required class="inp tracking-widest" autocomplete="one-time-code"></label>
         <label class="block text-xs font-medium text-gray-500">Шинэ нууц үг<input name="pw" type="password" required class="inp" autocomplete="new-password"></label>
         <label class="block text-xs font-medium text-gray-500">Шинэ нууц үг давтах<input name="pw2" type="password" required class="inp" autocomplete="new-password"></label>
         <p class="text-xs text-gray-400">8-аас дээш тэмдэгт, үсэг ба тоо агуулсан байна.</p>
